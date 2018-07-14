@@ -1,14 +1,12 @@
 # Astar_Sliding_Puzzle
 
-Usage：
+## Usage ##
 python solver.py inputfile.txt
 
-
-結果:
+## 結果 ##
 move シーケンスはBlankの移動位置、一番左上は（1,1）
 
-
-What's this:
+## What's this ##
 ４ｘ３のタイルパズルを解くソルバ(4x3以外も解ける)。
 通常のタイルパズルは４ｘ４あるいは３ｘ３であるがここでは４ｘ３のソルバを書く。
 
