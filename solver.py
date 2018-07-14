@@ -4,10 +4,10 @@ import math
 import copy
 
 class Board:
-    def __init__(self,  gridn=3,gridm=4, grid=None):
-        self.gridn = gridn
-        self.gridm = gridm
-        size = gridn * gridm
+    def __init__(self,  gridw=3,gridh=4, grid=None):
+        self.gridw = gridw
+        self.gridh = gridh
+        size = gridw * gridh
 
         self.cells_list=[]
 
@@ -21,7 +21,7 @@ class Board:
         #ターゲット
         self.target = {}
         for x in range(size+1):
-            self.target[x] = x % self.gridn, x / self.gridn
+            self.target[x] = x % self.gridw, x / self.gridw
 
     def cell_xy(self,cell_to_find):
         '''
@@ -71,9 +71,9 @@ class Board:
 
         moves = []
         if up > -1: moves.append((x, up))
-        if down < self.gridm : moves.append((x, down))
+        if down < self.gridh : moves.append((x, down))
         if left > -1: moves.append((left, y))
-        if right < self.gridn : moves.append((right, y))
+        if right < self.gridw : moves.append((right, y))
         return moves
     
     def print_grid(self):
