@@ -2,6 +2,7 @@
 
 ## Usage ##
 python solver.py inputfile.txt
+### python version = 2.7
 
 ## 結果 ##
 move シーケンスはBlankの移動位置、一番左上は（1,1）
