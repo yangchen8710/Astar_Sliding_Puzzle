@@ -128,7 +128,7 @@ class AstarSlover:
         moves.reverse()
 
         print("Sloved!")
-        print(str(len(moves))+" Moves:"+str(moves))
+        print(str(len(moves))+" Moves:"+str(moves)+"\n")
 
     def slove(self,board):
         openset = [Node(board)]
@@ -162,16 +162,18 @@ class Helper:
 
 def main():
     #inputstr = "1 4 2 6 0 3 7 11 5 9 8 10"
-    with open(sys.argv[1]) as file:
-        inputstr = file.readline()
+
     astar = AstarSlover()
     helper = Helper()
 
-    grid = helper.transtr2grid(inputstr)
+    with open(sys.argv[1]) as file:
+        inputstrs = file.readlines()
 
-    board = Board(3,4,grid)
-    board.print_grid()
-    astar.slove(board)
+    for inputstr in inputstrs:
+        grid = helper.transtr2grid(inputstr)
+        board = Board(3,4,grid)
+        board.print_grid()
+        astar.slove(board)
 
 if __name__ == "__main__":
     main()
