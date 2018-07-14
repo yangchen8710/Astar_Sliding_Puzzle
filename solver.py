@@ -82,7 +82,7 @@ class Board:
         #print ""
 
 class Node:
-    def __init__(self, board, move, g_score, last):
+    def __init__(self, board, g_score = 0,move = None, last = None):
         self.board = board
 
         #結果のシーケンスを表示用
@@ -99,7 +99,7 @@ class Node:
             board = copy.deepcopy(self.board)
             board.take_move(move)
 
-            nodes.append(Node(board, move, self.g_score + 1, self))
+            nodes.append(Node(board, self.g_score + 1,move, self))
         
         return nodes
 
@@ -131,7 +131,7 @@ class AstarSlover:
         print(str(len(moves))+" Moves:"+str(moves))
 
     def slove(self,board):
-        openset = [Node(board, None, 0, None)]
+        openset = [Node(board)]
         closedset = []
 
         while True:
