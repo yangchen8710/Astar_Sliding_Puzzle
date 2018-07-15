@@ -18,7 +18,7 @@ class Board:
         for y, row in enumerate(self.grid):
             for x, cell in enumerate(row):
                 if cell == cell_to_find:
-                    return x,　y
+                    return x, y
 
     def heuristic(self):
         '''
