@@ -4,25 +4,14 @@ import math
 import copy
 
 class Board:
-    def __init__(self,  gridw=3,gridh=4, grid=None):
-        self.gridw = gridw
-        self.gridh = gridh
-        size = gridw * gridh
-
-        self.cells_list=[]
-
-        #Grid中のcellのList
-        for x in range(size):
-            self.cells_list.append(x)
-        
+    target = {}
+    gridw = 0
+    gridh = 0
+    size = 0
+    def __init__(self,  grid=None):
         self.grid = grid
         self.blank = self.cell_xy(0)
         
-        #ターゲット
-        self.target = {}
-        for x in range(size+1):
-            self.target[x] = x % self.gridw, x / self.gridw
-
     def cell_xy(self,cell_to_find):
         '''
         cellの位置を返す
@@ -37,11 +26,10 @@ class Board:
         A*のヒューリスティック関数、ターゲットとのマンハッタン距離で計算
         '''
         manhattan_distance = 0
-        for cell in self.cells_list:
+        for cell in range(self.size):
             x,y = self.cell_xy(cell)
-            manhattan_distance += math.fabs(x - self.target[cell][0]) + math.fabs(y - self.target[cell][1])
+            manhattan_distance += math.fabs(x - Board.target[cell][0]) + math.fabs(y - Board.target[cell][1])
         return manhattan_distance
-
     
     def take_move(self, move):
         """
@@ -71,15 +59,14 @@ class Board:
 
         moves = []
         if up > -1: moves.append((x, up))
-        if down < self.gridh : moves.append((x, down))
+        if down < Board.gridh : moves.append((x, down))
         if left > -1: moves.append((left, y))
-        if right < self.gridw : moves.append((right, y))
+        if right < Board.gridw : moves.append((right, y))
         return moves
     
     def print_grid(self):
         for  row in self.grid:
                 print row
-        #print ""
 
 class Node:
     def __init__(self, board, g_score = 0,move = None, last = None):
@@ -150,29 +137,43 @@ class AstarSlover:
                 closedset.append(node)
 
 class Helper:
-    def transtr2grid(self,inputstr):
+    def __init__(self, gridh=4, gridw=3):
+        Board.gridw  = gridw
+        Board.gridh  = gridh
+        Board.size = gridw * gridh
+
+        #ターゲット
+        Board.target = {}
+        for x in range(Board.size):
+            Board.target[x] = x % Board.gridw, x / Board.gridw
+
+    def str2grid(self,inputstr):
         cells = [int(n) for n in inputstr.split(" ")]
         grid = []
-        for y in xrange(4):
+        for y in xrange(Board.gridh):
             row = []
-            for x in xrange(3):
-                row.append(cells[y*3+x])
+            for x in xrange(Board.gridw):
+                row.append(cells[y*Board.gridw+x])
             grid.append(row)
         return grid
 
 def main():
-    #inputstr = "1 4 2 6 0 3 7 11 5 9 8 10"
-
+    #create 4x3 board, and final target 
+    helper = Helper() #Helper(3,4) 
     astar = AstarSlover()
-    helper = Helper()
 
     with open(sys.argv[1]) as file:
-        inputstrs = file.readlines()
+        inputs = file.readlines()
 
-    for inputstr in inputstrs:
-        grid = helper.transtr2grid(inputstr)
-        board = Board(3,4,grid)
+    for inputstr in inputs:
+        #read cells to grid
+        grid = helper.str2grid(inputstr)
+        board = Board(grid)
+
+        #print grid
         board.print_grid()
+
+        #slove
         astar.slove(board)
 
 if __name__ == "__main__":
