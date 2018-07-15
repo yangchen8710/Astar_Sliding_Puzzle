@@ -8,17 +8,17 @@ class Board:
     gridw = 0
     gridh = 0
     size = 0
-    def __init__(self,  grid):
+    def __init__(self, grid):
         self.grid = grid
         
-    def cell_xy(self,cell_to_find):
+    def cell_xy(self, cell_to_find):
         '''
         cellの位置を返す
         '''
         for y, row in enumerate(self.grid):
             for x, cell in enumerate(row):
                 if cell == cell_to_find:
-                    return x,y
+                    return x,　y
 
     def heuristic(self):
         '''
@@ -75,16 +75,26 @@ class Node:
 
         self.g_score = g_score
         self.f_score = g_score + board.heuristic() #f(n)
+
+    def print_move_sequance(self):
+        '''
+        結果のシーケンスを表示する
+        '''
+        moves = []
+        node = self
+        while node.last:
+            moves.append((node.move[0] + 1, node.move[1] + 1))#(左上を（1,1）に)
+            node = node.last
+        moves.reverse()
+        
+        print(str(len(moves)) + " Moves:" + str(moves) + "\n")
     
     def create_children(self):
         nodes = []
-
         for move in self.board.create_moves():
             next_board = copy.deepcopy(self.board)
             next_board.take_move(move)
-
             nodes.append(Node(next_board, self.g_score + 1, move, self))
-        
         return nodes
 
 
@@ -101,28 +111,16 @@ class AstarSlover:
                 lowest_node = node
         return lowest_node
 
-    def get_move_sequance(self,node):
-        '''
-        結果のシーケンスを表示する
-        '''
-        moves = []
-        while node.last:
-            moves.append((node.move[0] + 1, node.move[1] + 1))
-            node = node.last
-        moves.reverse()
-
-        print("Sloved!")
-        print(str(len(moves)) + " Moves:" + str(moves) + "\n")
-
     def slove(self,board):
         openset = [Node(board)]
         closedset = []
 
         while True:
             node = self.get_lowest_node(openset)
-            
+
             if node.board.heuristic() == 0:
-                self.get_move_sequance(node)
+                print("Sloved!")
+                node.print_move_sequance()
                 break
             else:
                 openset.remove(node)
@@ -131,6 +129,7 @@ class AstarSlover:
                         continue
                     if child not in openset:
                         openset.append(child)
+
                 closedset.append(node)
 
 class Helper:
@@ -157,7 +156,7 @@ class Helper:
 def main():
     #create 4x3 board, and final target 
     helper = Helper() #Helper(3,4) 
-    
+
     astar = AstarSlover()
 
     with open(sys.argv[1]) as file:
