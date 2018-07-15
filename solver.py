@@ -8,9 +8,8 @@ class Board:
     gridw = 0
     gridh = 0
     size = 0
-    def __init__(self,  grid=None):
+    def __init__(self,  grid):
         self.grid = grid
-        self.blank = self.cell_xy(0)
         
     def cell_xy(self,cell_to_find):
         '''
@@ -36,21 +35,19 @@ class Board:
         移動させる
         """
         x, y = move
-        e_x, e_y = self.blank
+        blank_x, blank_y = self.cell_xy(0)
 
         #swap 
-        temp = self.grid[y][x]
+        temp_cell = self.grid[y][x]
         self.grid[y][x] = 0
-        self.grid[e_y][e_x] = temp
-
-        #set blank positon
-        self.blank = x, y 
+        self.grid[blank_y][blank_x] = temp_cell
 
     def create_moves(self):
         '''
         blankの移動できる位置のリスト
         '''
-        x, y = self.blank
+        #blankの現在位置
+        x, y = self.cell_xy(0)
 
         up = y - 1
         down = y + 1
@@ -65,8 +62,8 @@ class Board:
         return moves
     
     def print_grid(self):
-        for  row in self.grid:
-                print row
+        for row in self.grid:
+            print row
 
 class Node:
     def __init__(self, board, g_score = 0,move = None, last = None):
@@ -83,10 +80,10 @@ class Node:
         nodes = []
 
         for move in self.board.create_moves():
-            board = copy.deepcopy(self.board)
-            board.take_move(move)
+            next_board = copy.deepcopy(self.board)
+            next_board.take_move(move)
 
-            nodes.append(Node(board, self.g_score + 1,move, self))
+            nodes.append(Node(next_board, self.g_score + 1, move, self))
         
         return nodes
 
@@ -110,12 +107,12 @@ class AstarSlover:
         '''
         moves = []
         while node.last:
-            moves.append((node.move[0]+1,node.move[1]+1))
+            moves.append((node.move[0] + 1, node.move[1] + 1))
             node = node.last
         moves.reverse()
 
         print("Sloved!")
-        print(str(len(moves))+" Moves:"+str(moves)+"\n")
+        print(str(len(moves)) + " Moves:" + str(moves) + "\n")
 
     def slove(self,board):
         openset = [Node(board)]
@@ -129,11 +126,11 @@ class AstarSlover:
                 break
             else:
                 openset.remove(node)
-                for new_node in node.create_children():
-                    if new_node in closedset:
+                for child in node.create_children():
+                    if child in closedset:
                         continue
-                    if new_node not in openset:
-                        openset.append(new_node)
+                    if child not in openset:
+                        openset.append(child)
                 closedset.append(node)
 
 class Helper:
@@ -144,8 +141,8 @@ class Helper:
 
         #ターゲット
         Board.target = {}
-        for x in range(Board.size):
-            Board.target[x] = x % Board.gridw, x / Board.gridw
+        for cell in range(Board.size):
+            Board.target[cell] = cell % Board.gridw, cell / Board.gridw
 
     def str2grid(self,inputstr):
         cells = [int(n) for n in inputstr.split(" ")]
@@ -153,13 +150,14 @@ class Helper:
         for y in xrange(Board.gridh):
             row = []
             for x in xrange(Board.gridw):
-                row.append(cells[y*Board.gridw+x])
+                row.append(cells[y * Board.gridw + x])
             grid.append(row)
         return grid
 
 def main():
     #create 4x3 board, and final target 
     helper = Helper() #Helper(3,4) 
+    
     astar = AstarSlover()
 
     with open(sys.argv[1]) as file:
