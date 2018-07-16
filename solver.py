@@ -1,6 +1,5 @@
 # -*- coding: utf8 -*-
 import sys
-import math
 import copy
 
 class Board:
@@ -27,7 +26,7 @@ class Board:
         manhattan_distance = 0
         for cell in range(self.size):
             x,y = self.cell_xy(cell)
-            manhattan_distance += math.fabs(x - Board.target[cell][0]) + math.fabs(y - Board.target[cell][1])
+            manhattan_distance += abs(x - Board.target[cell][0]) + abs(y - Board.target[cell][1])
         return manhattan_distance
     
     def take_move(self, move):
@@ -38,9 +37,7 @@ class Board:
         blank_x, blank_y = self.cell_xy(0)
 
         #swap 
-        temp_cell = self.grid[y][x]
-        self.grid[y][x] = 0
-        self.grid[blank_y][blank_x] = temp_cell
+        self.grid[y][x], self.grid[blank_y][blank_x]  = 0, self.grid[y][x]
 
     def create_moves(self):
         '''
@@ -66,25 +63,25 @@ class Board:
             print row
 
 class Node:
-    def __init__(self, board, g_score = 0,move = None, last = None):
+    def __init__(self, board, g_score = 0, move = None, came_from = None):
         self.board = board
 
         #結果のシーケンスを表示用
         self.move = move
-        self.last = last
+        self.came_from = came_from
 
         self.g_score = g_score
         self.f_score = g_score + board.heuristic() #f(n)
 
-    def print_move_sequance(self):
+    def print_move_sequence(self):
         '''
         結果のシーケンスを表示する
         '''
         moves = []
         node = self
-        while node.last:
+        while node.came_from:
             moves.append((node.move[0] + 1, node.move[1] + 1))#(左上を（1,1）に)
-            node = node.last
+            node = node.came_from
         moves.reverse()
         
         print(str(len(moves)) + " Moves:" + str(moves) + "\n")
@@ -97,8 +94,16 @@ class Node:
             nodes.append(Node(next_board, self.g_score + 1, move, self))
         return nodes
 
+class AstarSolver:
+    def find_node_in_set(self,nodeset,node_to_find):
+        '''
+        gridで比較
+        '''
+        for node in nodeset:
+            if node.board.grid == node_to_find.board.grid:
+                return node
+        return None
 
-class AstarSlover:
     def get_lowest_node(self,nodeset):
         '''
         f_scoreの一番低いノードを返す
@@ -111,7 +116,7 @@ class AstarSlover:
                 lowest_node = node
         return lowest_node
 
-    def slove(self,board):
+    def solve(self,board):
         openset = [Node(board)]
         closedset = []
 
@@ -119,21 +124,26 @@ class AstarSlover:
             node = self.get_lowest_node(openset)
 
             if node.board.heuristic() == 0:
-                print("Sloved!")
-                node.print_move_sequance()
+                print("Solved!")
+                node.print_move_sequence()
                 break
             else:
                 openset.remove(node)
                 for child in node.create_children():
-                    if child in closedset:
+                    if self.find_node_in_set(closedset,child):
                         continue
-                    if child not in openset:
+
+                    node_in_open_set = self.find_node_in_set(openset,child)
+                    if not node_in_open_set:
+                        openset.append(child)
+                    elif child.g_score < node_in_open_set.g_score:
+                        openset.remove(node_in_open_set)
                         openset.append(child)
 
                 closedset.append(node)
 
 class Helper:
-    def __init__(self, gridh=4, gridw=3):
+    def __init__(self, gridw=3, gridh=4):
         Board.gridw  = gridw
         Board.gridh  = gridh
         Board.size = gridw * gridh
@@ -154,10 +164,10 @@ class Helper:
         return grid
 
 def main():
-    #create 4x3 board, and final target 
+    #create 3x4 board, and final target 
     helper = Helper() #Helper(3,4) 
 
-    astar = AstarSlover()
+    astar = AstarSolver()
 
     with open(sys.argv[1]) as file:
         inputs = file.readlines()
@@ -170,8 +180,8 @@ def main():
         #print grid
         board.print_grid()
 
-        #slove
-        astar.slove(board)
+        #solve
+        astar.solve(board)
 
 if __name__ == "__main__":
     main()
